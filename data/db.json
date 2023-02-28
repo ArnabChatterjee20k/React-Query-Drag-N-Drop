@@ -1118,12 +1118,6 @@
     },
     {
       "userId": 10,
-      "id": 195,
-      "title": "rerum ex veniam mollitia voluptatibus pariatur",
-      "completed": true
-    },
-    {
-      "userId": 10,
       "id": 196,
       "title": "consequuntur aut ut fugit similique",
       "completed": false
@@ -1133,18 +1127,6 @@
       "id": 197,
       "title": "dignissimos quo nobis earum saepe",
       "completed": false
-    },
-    {
-      "userId": 10,
-      "id": 198,
-      "title": "quis eius est sint explicabo",
-      "completed": false
-    },
-    {
-      "userId": 1,
-      "title": "Hey!",
-      "completed": true,
-      "id": 203
     }
   ]
 }
