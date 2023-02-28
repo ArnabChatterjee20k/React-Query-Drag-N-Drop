@@ -3,7 +3,9 @@ import { getTodos, addTodo, updateTodo, deleteTodo } from "../../api/todosApi"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faTrash, faUpload } from "@fortawesome/free-solid-svg-icons"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { DragDropContext, Draggable } from "react-beautiful-dnd"
+import { StrictModeDroppable } from "../../helpers/StrictModeDroppable"
 
 const TodoList = () => {
     const [newTodo, setNewTodo] = useState('')
@@ -13,10 +15,17 @@ const TodoList = () => {
         isLoading,
         isError,
         error,
-        data: todos
+        data,
     } = useQuery('todos', getTodos, {
         select: data => data.sort((a, b) => b.id - a.id)
     })
+
+    const [todos,updateTodos] = useState(data || [])
+
+    useEffect(() => {
+      updateTodos(data)
+    }, [data])
+    
 
     const addTodoMutation = useMutation(addTodo, {
         onSuccess: () => {
@@ -45,6 +54,33 @@ const TodoList = () => {
         setNewTodo('')
     }
 
+    const handleOnDragEnd = (result)=>{
+      // console.log({result})
+      if(!result.destination) return
+
+      const tasks = [...todos]
+
+      // taking the item
+      const [reorderedItem] = tasks.splice(result.source.index,1)
+
+      // putting the item
+      tasks.splice(result.destination.index , 0 , reorderedItem)
+
+      updateTodos(tasks)
+
+    }
+
+    const handleDelete = (id) => {
+        const arrayIdsOrder = JSON.parse(localStorage.getItem('taskOrder'))
+
+        if (arrayIdsOrder?.length) {
+            const newIdsOrderArray = arrayIdsOrder.filter(num => num !== id)
+            localStorage.setItem('taskOrder', JSON.stringify(newIdsOrderArray))
+        }
+
+        deleteTodoMutation.mutate({ id })
+    }
+
     const newItemSection = (
         <form onSubmit={handleSubmit}>
             <label htmlFor="new-todo">Enter a new todo item</label>
@@ -69,26 +105,41 @@ const TodoList = () => {
     } else if (isError) {
         content = <p>{error.message}</p>
     } else {
-        content = todos.map((todo) => {
-            return (
-                <article key={todo.id}>
-                    <div className="todo">
-                        <input
-                            type="checkbox"
-                            checked={todo.completed}
-                            id={todo.id}
-                            onChange={() =>
-                                updateTodoMutation.mutate({ ...todo, completed: !todo.completed })
-                            }
-                        />
-                        <label htmlFor={todo.id}>{todo.title}</label>
-                    </div>
-                    <button className="trash" onClick={() => deleteTodoMutation.mutate({ id: todo.id })}>
-                        <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                </article>
-            )
-        })
+        content = (
+            <DragDropContext onDragEnd={handleOnDragEnd}>
+                <StrictModeDroppable droppableId="todos">
+                    {(provided) => (
+                        <section {...provided.droppableProps} ref={provided.innerRef}>
+                            {todos.map((todo, index) => {
+                                return (
+                                    <Draggable key={todo.id} draggableId={todo.id.toString()} index={index}>
+                                        {(provided) => (
+                                            <article {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+                                                <div className="todo">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={todo.completed}
+                                                        id={todo.id}
+                                                        onChange={() =>
+                                                            updateTodoMutation.mutate({ ...todo, completed: !todo.completed })
+                                                        }
+                                                    />
+                                                    <label htmlFor={todo.id}>{todo.title}</label>
+                                                </div>
+                                                <button className="trash" onClick={() => handleDelete(todo.id)}>
+                                                    <FontAwesomeIcon icon={faTrash} />
+                                                </button>
+                                            </article>
+                                        )}
+                                    </Draggable>
+                                )
+                            })}
+                            {provided.placeholder}
+                        </section>
+                    )}
+                </StrictModeDroppable>
+            </DragDropContext>
+        )
     }
 
     return (
