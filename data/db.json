@@ -1060,7 +1060,7 @@
       "userId": 10,
       "id": 185,
       "title": "voluptates dignissimos sed doloribus animi quaerat aut",
-      "completed": false
+      "completed": true
     },
     {
       "userId": 10,
@@ -1126,13 +1126,13 @@
       "userId": 10,
       "id": 196,
       "title": "consequuntur aut ut fugit similique",
-      "completed": true
+      "completed": false
     },
     {
       "userId": 10,
       "id": 197,
       "title": "dignissimos quo nobis earum saepe",
-      "completed": true
+      "completed": false
     },
     {
       "userId": 10,
@@ -1142,21 +1142,9 @@
     },
     {
       "userId": 1,
-      "title": "Learn stuff",
-      "completed": false,
-      "id": 202
-    },
-    {
-      "userId": 1,
       "title": "Hey!",
       "completed": true,
       "id": 203
-    },
-    {
-      "userId": 1,
-      "title": "sdfsdf",
-      "completed": false,
-      "id": 204
     }
   ]
 }
